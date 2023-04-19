@@ -9,13 +9,17 @@
 
 .description {
   display: inherit;
+  flex-direction: column;
   justify-content: inherit;
   align-items: inherit;
   font-size: 0.85rem;
-  max-width: var(--max-width);
+  /* max-width: var(--max-width); */
+
+  max-width: 600px;
   width: 100%;
   z-index: 2;
   font-family: var(--font-mono);
+  margin-block: 2rem;
 }
 
 .description a {
@@ -27,7 +31,8 @@
 
 .description p {
   position: relative;
-  margin: 0;
+
+  margin-block: 1rem;
   padding: 1rem;
   background-color: rgba(var(--callout-rgb), 0.5);
   border: 1px solid rgba(var(--callout-border-rgb), 0.3);
@@ -39,9 +44,15 @@
   font-family: var(--font-mono);
 }
 
-.grid {
+/* .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(25%, auto));
+  width: var(--max-width);
+  max-width: 100%;
+} */
+.grid {
+  display: flex;
+  flex-direction: column;
   width: var(--max-width);
   max-width: 100%;
 }
@@ -202,6 +213,18 @@
   }
 }
 
+.metadataRow {
+  display: flex;
+  flex-direction: row;
+  /* space between */
+  justify-content: space-between;
+}
+
+.metadataRow > p {
+  /* no wrapping text content */
+  white-space: nowrap;
+}
+
 /* Tablet and Smaller Desktop */
 @media (min-width: 701px) and (max-width: 1120px) {
   .grid {
@@ -226,4 +249,50 @@
   to {
     transform: rotate(0deg);
   }
+}
+
+/* Search form styles */
+.searchForm {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  background-color: rgba(var(--card-rgb), 0.1);
+  border: 1px solid rgba(var(--card-border-rgb), 0.15);
+}
+
+.searchForm input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid rgba(var(--card-border-rgb), 0.15);
+  border-radius: var(--border-radius);
+  background-color: rgba(var(--card-rgb), 0.1);
+  color: var(--text-color);
+  font-size: 1rem;
+  font-family: var(--font-mono);
+}
+
+.searchForm button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(var(--card-border-rgb), 0.15);
+  border-radius: var(--border-radius);
+  background-color: rgba(var(--card-rgb), 0.1);
+  color: var(--text-color);
+  font-size: 1rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
+}
+
+.textContent {
+  display: block;
+  font-size: 1rem;
+  margin-top: 0.2rem;
+  /* just make the font *slightly* heavier */
+  font-weight: 301 !important;
+  font-family: 'Minion Web', serif;
 }
