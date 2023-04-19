@@ -1,8 +1,13 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { odonnell_corpus, hellenistic_corpus } from '../../public/corpora';
+import metaDataArray from '../../public/data/hellenistic_author_metadata.json';
 
 console.log('loading api ...');
+const metaDataDict = metaDataArray.reduce((acc, obj) => {
+  acc[`${obj.authorId}_${obj.workId}`] = obj;
+  return acc;
+}, {});
 
 const hellenistic_author_ids = new Set(hellenistic_corpus.map(entry => entry.id));
 const odonnell_corpus_pairs = new Set(odonnell_corpus.map(entry => `${entry.authorId}_${entry.workId}`));
@@ -25,6 +30,9 @@ async function* readFromJsonFiles(searchTerms, use_odonnell_corpus) {
         (use_odonnell_corpus && !odonnell_corpus_pairs.has(`${author_id}_${work_id}`))) {
         continue;
       }
+
+      // Get metadata if it exists
+      const metadata = metaDataDict[`${author_id}_${work_id}`];
 
       // Retrieve the author object
       const author = hellenistic_author_dict[author_id];
@@ -51,11 +59,11 @@ async function* readFromJsonFiles(searchTerms, use_odonnell_corpus) {
             const lemmasNoAccentsLower = lemmas.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
             if (tokensNoAccentsLower.includes(termNoAccentsLower) || lemmasNoAccentsLower.includes(termNoAccentsLower)) {
               // Add the author object to the result
-              obj.author = author;
+              obj.metadata = { ...metadata, ...author };
               if (odonnell_work) {
                 obj.odonnell_work = odonnell_work;
               }
-              console.log('found', term, obj);
+              // console.log('found', term, obj);
               yield obj;
               break;
             }
