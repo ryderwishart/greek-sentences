@@ -244,7 +244,16 @@ export default function Home() {
           }
           <div className={styles.description}>
             <p className={inter.className}>
-              Search for Greek sentences containing a given word. Multiple search terms should be separated by a comma. For example, &quot;ἀγαθός, ἀγαθότης&quot; will return sentences containing either ἀγαθός and ἀγαθότης, but &quot;ἀγαθός ἀγαθότης&quot; will return sentences containing ἀγαθός ἀγαθότης exactly. Accents and breathing marks are stripped from the search terms.
+              Search for Greek sentences containing a given word.
+              Multiple search terms should be separated by a comma.
+              For example, &quot;ἀγαθός, ἀγαθότης&quot; will return
+              sentences containing either ἀγαθός or ἀγαθότης, or both,
+              but &quot;ἀγαθός ἀγαθότης&quot; will return sentences
+              containing ἀγαθός ἀγαθότης exactly. Accents and breathing
+              marks are stripped from the search terms. The number
+              of hits is accurate, but only a max of 500 sentences will
+              be returned. If you are getting that many results, refine
+              your search a bit. If you need more than that, contact Ryder.
             </p>
           </div>
         </main>
