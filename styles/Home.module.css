@@ -277,6 +277,7 @@
 .searchForm {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
@@ -298,8 +299,8 @@
   }
 }
 
-.searchForm input {
-  width: 100%;
+.searchForm > input {
+  width: 60%;
   padding: 0.5rem;
   border: 1px solid rgba(var(--card-border-rgb), 0.15);
   border-radius: var(--border-radius);
@@ -325,9 +326,19 @@
   margin-bottom: 0.5rem;
   color: var(--text-color);
   font-family: var(--font-mono);
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 }
 .searchForm label > input {
   margin: 0.5rem;
+  display: inline;
+}
+
+.searchForm .oneHundredPercentFlexBasisRowItem {
+  flex-basis: 100%;
 }
 
 .textContent {

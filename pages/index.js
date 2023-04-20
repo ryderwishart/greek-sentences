@@ -177,10 +177,11 @@ export default function Home() {
               <button onClick={downloadCSV} disabled={results.length === 0}>
                 💾
               </button>
-              {/* <label
+              <div className={styles.oneHundredPercentFlexBasisRowItem} />
+              <label
                 htmlFor="use_odonnell"
               >
-                Use O&apos;Donnell Corpus
+                Limit Corpus to O&apos;Donnell Corpus Only
                 <input
                   type="checkbox"
                   id="use_odonnell"
@@ -188,7 +189,7 @@ export default function Home() {
                   checked={useOdonnellCorpus}
                   onChange={() => setUseOdonnellCorpus(!useOdonnellCorpus)}
                 />
-              </label> */}
+              </label>
               {
                 results.length > 0 &&
                 <p>{results.length} results found</p>
