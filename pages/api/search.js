@@ -116,7 +116,7 @@ export default async (req, res) => {
     return res.status(404).json({ error: 'No results found.' });
   }
 
-  const truncatedResults = results.slice(0, 500 > results.length ? results.length : 500);
+  const truncatedResults = results.slice(0, 50 > results.length ? results.length : 50);
 
   res.status(200).json({
     count: results.length,

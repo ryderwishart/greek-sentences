@@ -298,9 +298,11 @@ export default function Home() {
               but &quot;ἀγαθός ἀγαθότης&quot; will return sentences
               containing ἀγαθός ἀγαθότης exactly. Accents and breathing
               marks are stripped from the search terms. The number
-              of hits is accurate, but only a max of 500 sentences will
+              of hits is accurate, but only a max of 50 sentences will
               be returned. If you are getting that many results, refine
-              your search a bit. If you need more than that, contact Ryder.
+              your search a bit (use the autocomplete suggestions to
+              see token/lemma variations). If you need more than that, 
+              contact Ryder.
             </p>
           </div>
           {loading && (
