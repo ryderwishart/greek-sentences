@@ -36,11 +36,8 @@ const hellenistic_author_dict = Object.fromEntries(hellenistic_corpus.map(entry 
 
 async function* readFromJsonFiles(searchTerms, useOdonnellCorpusFlag = false) {
   const dataPath = path.join(process.cwd(), 'public/data/json_sentence_pairs');
-  // console.log({ dirname: __dirname, joined: path.join(__dirname, dataPath) });
-  // const jsonPath = path.join(__dirname, dataPath);
   const jsonPath = dataPath
   const jsonFiles = await fs.readdir(jsonPath);
-  // console.log({ jsonFiles })
 
   for (const file of jsonFiles) {
     if (file.endsWith('.json')) {
@@ -56,10 +53,7 @@ async function* readFromJsonFiles(searchTerms, useOdonnellCorpusFlag = false) {
       const author = hellenistic_author_dict[author_id];
       let fallbackMetadata;
       if (!author) {
-        // lookup work id in fallback metadata
-
         fallbackMetadata = fallbackMetaDataDict[`${author_id}_${work_id}`]
-        console.log({ fallbackMetadata, id: `${author_id}_${work_id}`, hellenistic_author_dict_data: hellenistic_author_dict[author_id] })
       }
 
       const content = await fs.readFile(path.join(jsonPath, file), 'utf8');
@@ -79,12 +73,14 @@ async function* readFromJsonFiles(searchTerms, useOdonnellCorpusFlag = false) {
           }
           for (const term of searchTerms) {
             const termNoAccentsLower = term.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            const termNoAccentsOrBreathingMarksLower = termNoAccentsLower.replace(/[\u0345\u0301\u0300]/g, '');
             const tokensNoAccentsLower = tokens.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            const tokensNoAccentsOrBreathingMarksLower = tokensNoAccentsLower.replace(/[\u0345\u0301\u0300]/g, '');
             const lemmasNoAccentsLower = lemmas.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-            if (tokensNoAccentsLower.includes(termNoAccentsLower) || lemmasNoAccentsLower.includes(termNoAccentsLower)) {
+            const lemmasNoAccentsOrBreathingMarksLower = lemmasNoAccentsLower.replace(/[\u0345\u0301\u0300]/g, '');
+            if (tokensNoAccentsOrBreathingMarksLower.includes(termNoAccentsOrBreathingMarksLower) || lemmasNoAccentsOrBreathingMarksLower.includes(termNoAccentsOrBreathingMarksLower)) {
               // Add the author object to the result
               obj.metadata = { ...metadata, ...fallbackMetaData, author: author || fallbackMetadata ? fallbackMetadata?.name : 'no data' };
-              // console.log('found', term, obj);
               yield obj;
               break;
             }
