@@ -303,6 +303,11 @@ export default function Home() {
               your search a bit. If you need more than that, contact Ryder.
             </p>
           </div>
+          {loading && (
+            <div className={styles.loadingOverlay}>
+              <div className={styles.spinner}></div>
+            </div>
+          )}
         </main>
       </>
     </>
