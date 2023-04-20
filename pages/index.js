@@ -52,24 +52,65 @@ function latinToGreek(input) {
   return cleanedInput.split('').map(char => latinToGreekMap[char] || char).join('');
 }
 
-const downloadCSV = () => {
-  const headers = ['id', 'sentence'];
-  const csvContent = [headers, ...results.map((result) => [result.id, result.sentence])]
-    .map((row) => row.join(','))
-    .join('\n');
-  const csvBlob = new Blob([csvContent], { type: 'text/csv' });
-  const csvUrl = URL.createObjectURL(csvBlob);
-  const link = document.createElement('a');
-  link.href = csvUrl;
-  link.download = 'search-results.csv';
-  link.click();
-  URL.revokeObjectURL(csvUrl);
-};
-
 export default function Home() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [useOdonnellCorpus, setUseOdonnellCorpus] = useState(false);
+
+  const downloadCSV = () => {
+    /*
+    filename: "tlg0527.tlg005.opp-grc2"
+    id: 473645
+    lemmas: "καί πᾶς ὁ  αὐτός  εἰς ὁ δίοδος αὐτός , καί  ὁ πόλις ἐν πῦρ καί πᾶς ὁ σκῦλον αὐτός πανδημεί   ὁ θεός  ·"
+    metadata: {
+      author: "Septuaginta"
+      authorId: "0527"
+      authorWorkId: "tlg0527.tlg005"
+      centuryOfAuthorLifetime: "300 BCE-300 CE"
+      dateRangeOfWork: "300 BCE-300 CE"
+      genre: "Bible\\Historical Texts\\Religious Texts\\Legal texts"
+      geographicLocation: "Alexandria, Egypt"
+      id: "0527"
+      name: "SEPTUAGINTA"
+      notes: null
+      tags: "Relig."
+      urn: "urn:cts:greekLit:tlg0527.tlg005.opp-grc2"
+      workId: "005"
+      workTitle: "Deuteronomium↵"
+    }
+    tokens: "καὶ πάντα 
+    */
+    const headers = ['id', 'filename', 'author', 'authorId', 'authorWorkId', 'centuryOfAuthorLifetime', 'dateRangeOfWork', 'genre', 'geographicLocation', 'name', 'notes', 'tags', 'urn', 'workId', 'workTitle', 'tokens', 'lemmas'];
+    const csvContent = [headers, ...results.results.map((result) => [
+      result.id,
+      result.metadata.filename,
+      result.metadata.author,
+      result.metadata.authorId,
+      result.metadata.authorWorkId,
+      result.metadata.centuryOfAuthorLifetime,
+      result.metadata.dateRangeOfWork,
+      result.metadata.genre,
+      result.metadata.geographicLocation,
+      result.metadata.name,
+      result.metadata.notes,
+      result.metadata.tags,
+      result.metadata.urn,
+      result.metadata.workId,
+      result.metadata.workTitle,
+      result.tokens,
+      result.lemmas,
+    ])]
+      .map((row) => row.join(','))
+      .join('\n');
+    const csvBlob = new Blob([csvContent], { type: 'text/csv' });
+    const csvUrl = URL.createObjectURL(csvBlob);
+    const link = document.createElement('a');
+    link.href = csvUrl;
+    link.download = `${query}_search-results.csv`;
+    link.click();
+    URL.revokeObjectURL(csvUrl);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -88,7 +129,13 @@ export default function Home() {
       }
     });
 
+    // If use_odonnell is checked, add it to the URL.
+    if (useOdonnellCorpus) {
+      url += '&useOdonnellCorpus=true';
+    }
+
     // Fetch the results and handle them as needed.
+    console.log({ url })
     const response = await fetch(url);
     const results = await response.json()
     console.log(results);
@@ -119,9 +166,6 @@ export default function Home() {
             <h1 className={inter.className}>
               Search Greek Sentences
             </h1>
-            <p className={inter.className}>
-              Search for Greek sentences containing a given word. Multiple search terms should be separated by a comma. For example, "ἀγαθός, ἀγαθότης" will return sentences containing either ἀγαθός and ἀγαθότης, but "ἀγαθός ἀγαθότης" will return sentences containing ἀγαθός ἀγαθότης exactly. Accents and breathing marks are stripped from the search terms.
-            </p>
             <form onSubmit={handleSubmit} className={styles.searchForm}>
               <input
                 type="text"
@@ -131,8 +175,20 @@ export default function Home() {
               />
               <button type="submit">Search</button>
               <button onClick={downloadCSV} disabled={results.length === 0}>
-                Download Results as CSV
+                💾
               </button>
+              {/* <label
+                htmlFor="use_odonnell"
+              >
+                Use O&apos;Donnell Corpus
+                <input
+                  type="checkbox"
+                  id="use_odonnell"
+                  name="use_odonnell"
+                  checked={useOdonnellCorpus}
+                  onChange={() => setUseOdonnellCorpus(!useOdonnellCorpus)}
+                />
+              </label> */}
               {
                 results.length > 0 &&
                 <p>{results.length} results found</p>
@@ -141,7 +197,7 @@ export default function Home() {
           </div>
           {
             results.count > 0 &&
-            <div>
+            <div className={styles.status}>
               Number of hits:
               <span>
                 {results.count}
@@ -155,9 +211,19 @@ export default function Home() {
               next={() => { }}
               hasMore={false}
               loader={loading ? <h4>Loading...</h4> : null}
-              endMessage={<p>All results displayed.</p>}
+              endMessage={query ? <div className={styles.status}>All results displayed.</div> : <></>}
               className={styles.grid}
             >
+              {
+                results.results &&
+                <div className={styles.metadataRow}>
+                  <p className={inter.className}>Author: Title of work</p>
+                  <p className={inter.className}>Location</p>
+                  <p className={inter.className}>Date range of work or author</p>
+                  <p className={inter.className}>Genre</p>
+                  <p className={inter.className}>Categories</p>
+                </div>
+              }
               {/* Example result: {"id":36218,"filename":"tlg1443.tlg005.1st1K-grc1","tokens":"εἰ γὰρ μέχρι νῦν κατὰ Ἰουδαῖσμὸν ζῶμεν, ὁμολογοῦμεν χάριν μὴ εἰληφέναι.","lemmas":"εἰ γάρ μέχρι νῦν κατά ζήω , ὁμολογέω χάρις μή λαμβάνω .","metadata":{"author":"Ignatius Antiochenus\n","geographicLocation":"Antakya, Hatay Province, Turkey","centuryOfAuthorLifetime":"35 CE-108 CE","workTitle":"Ad Magnesios (epist. 2)","dateRangeOfWork":"80 CE-100 CE","urn":"urn:cts:greekLit:tlg1443.tlg005.1st1K-grc1","genre":"Epistles","notes":null,"authorWorkId":"tlg1443.tlg005","authorId":"1443","workId":"005","name":"IGNATIUS","tags":"Scr. Eccl.","id":"1443"}} */}
               {results.results && results.results.map((result, index) => (
                 <a className={styles.card} key={index + result.filename}>
@@ -175,6 +241,11 @@ export default function Home() {
               ))}
             </InfiniteScroll>
           }
+          <div className={styles.description}>
+            <p className={inter.className}>
+              Search for Greek sentences containing a given word. Multiple search terms should be separated by a comma. For example, "ἀγαθός, ἀγαθότης" will return sentences containing either ἀγαθός and ἀγαθότης, but "ἀγαθός ἀγαθότης" will return sentences containing ἀγαθός ἀγαθότης exactly. Accents and breathing marks are stripped from the search terms.
+            </p>
+          </div>
         </main>
       </>
     </>
