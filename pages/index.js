@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from '@/styles/Home.module.css';
+import lemmasAndTokens from '../public/data/lemmas_and_tokens_by_frequency.json';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 const dev = process.env.NODE_ENV !== 'production';
@@ -57,6 +58,32 @@ export default function Home() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [useOdonnellCorpus, setUseOdonnellCorpus] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+
+  const handleInputChange = (event) => {
+    const inputValue = latinToGreek(event.target.value);
+    setQuery(inputValue);
+
+    // Get the last token (word) from the input
+    const lastToken = inputValue
+      .split(/[\s.,;:!?]+/)
+      .filter(Boolean)
+      .pop() || '';
+
+    // Normalize lastToken and filter the suggestions
+    const normalizedLastToken = lastToken.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const filteredSuggestions = lemmasAndTokens
+      .map(([lemmaOrToken]) => lemmaOrToken)
+      .filter((lemmaOrToken) =>
+        lemmaOrToken
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .includes(normalizedLastToken),
+      )
+      .slice(0, 20);
+
+    setSuggestions(filteredSuggestions);
+  };
 
   const downloadCSV = () => {
     /*
@@ -167,12 +194,32 @@ export default function Home() {
               Search Greek Sentences
             </h1>
             <form onSubmit={handleSubmit} className={styles.searchForm}>
-              <input
-                type="text"
-                value={query}
-                onChange={(event) => setQuery(latinToGreek(event.target.value))}
-                placeholder="Enter a search term"
-              />
+              <div className={styles.searchInputWrapper}>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={handleInputChange}
+                  placeholder="Enter a search term"
+                  onBlur={() => setTimeout(() => setSuggestions([]), 100)}
+                />
+                {suggestions.length > 0 && (
+                  <ul className={styles.suggestionsList}>
+                    {suggestions.map((suggestion, index) => (
+                      <li
+                        key={index}
+                        onClick={() => {
+                          const tokens = query.split(/([\s.,;:!?]+)/);
+                          tokens[tokens.length - 1] = suggestion;
+                          setQuery(tokens.join(''));
+                          setSuggestions([]);
+                        }}
+                      >
+                        {suggestion}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
               <button type="submit">Search</button>
               <button onClick={downloadCSV} disabled={results.length === 0}>
                 💾

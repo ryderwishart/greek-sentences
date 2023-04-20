@@ -299,8 +299,8 @@
   }
 }
 
-.searchForm > input {
-  width: 60%;
+.searchForm > .searchInputWrapper > input {
+  width: 100%;
   padding: 0.5rem;
   border: 1px solid rgba(var(--card-border-rgb), 0.15);
   border-radius: var(--border-radius);
@@ -348,4 +348,34 @@
   /* just make the font *slightly* heavier */
   font-weight: 301 !important;
   font-family: 'Minion Web', serif;
+}
+
+.searchInputWrapper {
+  position: relative;
+  width: 60%;
+}
+
+.suggestionsList {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid rgba(var(--card-border-rgb), 0.15);
+  border-radius: var(--border-radius);
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  z-index: 999;
+  padding: 0.5rem;
+}
+
+.suggestionsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestionsList::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--card-border-rgb), 0.15);
+  border-radius: 3px;
 }
