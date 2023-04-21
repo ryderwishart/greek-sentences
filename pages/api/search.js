@@ -39,7 +39,9 @@ async function* readFromJsonFiles(searchTerms, useOdonnellCorpusFlag = false) {
   const jsonPath = dataPath
   const jsonFiles = await fs.readdir(jsonPath);
 
-  for (const file of jsonFiles) {
+  const filteredFiles = useOdonnellCorpusFlag ? jsonFiles.filter(file => odonnell_corpus.find(entry => file.startsWith(entry.authorId) && file.endsWith(entry.workId))) : jsonFiles;
+
+  for (const file of filteredFiles) {
     if (file.endsWith('.json')) {
       const [author_id, work_id] = file.split('.').slice(0, 2).map(id => id.slice(3));
 
@@ -116,12 +118,13 @@ export default async (req, res) => {
     return res.status(404).json({ error: 'No results found.' });
   }
 
-  const truncatedResults = results.slice(0, 50 > results.length ? results.length : 50);
+  const truncatedResults = results.slice(0, 25 > results.length ? results.length : 25);
 
   res.status(200).json({
     count: results.length,
     // format time as seconds to two decimal places
     time: (Date.now() - start) / 1000,
-    results: truncatedResults
+    results: truncatedResults,
+    responseSizeMB: (JSON.stringify(truncatedResults).length / 1024 / 1024).toFixed(2),
   });
 };
