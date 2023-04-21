@@ -4,6 +4,12 @@ import { odonnell_corpus, hellenistic_corpus } from '../../public/corpora';
 import metaDataArray from '../../public/data/hellenistic_author_metadata.json';
 import fallbackMetaData from '../../public/data/1bc-1ad-meta.json'
 
+export const config = {
+  api: {
+    responseLimit: '8mb',
+  },
+}
+
 console.log('loading api ...');
 const metaDataDict = metaDataArray.reduce((acc, obj) => {
   acc[`${obj.authorId}_${obj.workId}`] = obj;
